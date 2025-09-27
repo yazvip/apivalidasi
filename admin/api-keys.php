@@ -749,6 +749,17 @@ include 'includes/header.php';
                                 </button>
                             </div>
                         </div>
+                        
+                        <div class="mb-4">
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Actions</label>
+                            <div class="flex space-x-2">
+                                <button onclick="showModal('editModal<?= $key['id'] ?>')" class="flex-1 bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg transition-colors duration-200 text-sm">
+                                    <i class="fas fa-edit mr-1"></i> Edit
+                                </button>
+                                <button onclick="testApiKey('<?= htmlspecialchars($key['api_key']) ?>')" class="flex-1 bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg transition-colors duration-200 text-sm">
+                                    <i class="fas fa-flask mr-1"></i> Test
+                                </button>
+                                <form method="POST" class="inline-block">
                     </div>
                         <div class="px-6 py-4 border-t border-gray-200 flex justify-end space-x-3">
                             <button type="button" class="px-4 py-2 text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors duration-200" onclick="hideModalManually(document.getElementById('editModal<?= $key['id'] ?>'))">Cancel</button>
@@ -954,6 +965,14 @@ document.addEventListener('shown.bs.modal', function(e) {
         feedback.classList.remove('show');
     });
 });
+</script>
+
+<script>
+function testApiKey(apiKey) {
+    // Open API tester with pre-filled API key
+    const url = 'api-tester.php?api_key=' + encodeURIComponent(apiKey);
+    window.open(url, '_blank');
+}
 </script>
 
 <?php include 'includes/footer.php'; ?>

@@ -23,9 +23,7 @@ try {
     $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
     
     // Get user's API keys
-    $stmt = $pdo->prepare("SELECT api_key FROM api_keys WHERE user_id = ? AND is_active = 1");
-    $stmt->execute([$_SESSION['user_id']]);
-    $userApiKeys = $stmt->fetchAll(PDO::FETCH_COLUMN);
+    $userApiKeys = [$_SESSION['user_data']['api_key']];
     
     if (empty($userApiKeys)) {
         $stats = ['total_requests' => 0, 'successful_requests' => 0, 'failed_requests' => 0, 'active_days' => 0];
@@ -41,9 +39,9 @@ try {
                 COUNT(CASE WHEN status_code < 200 OR status_code >= 300 THEN 1 END) as failed_requests,
                 COUNT(DISTINCT DATE(created_at)) as active_days
             FROM api_logs 
-            WHERE api_key IN ($placeholders) AND created_at >= DATE_SUB(NOW(), INTERVAL 30 DAY)
+            WHERE api_key = ? AND created_at >= DATE_SUB(NOW(), INTERVAL 30 DAY)
         ");
-        $stmt->execute($userApiKeys);
+        $stmt->execute([$_SESSION['user_data']['api_key']]);
         $stats = $stmt->fetch(PDO::FETCH_ASSOC);
         
         // Get daily requests for chart
@@ -52,11 +50,11 @@ try {
                 DATE(created_at) as date,
                 COUNT(*) as requests
             FROM api_logs 
-            WHERE api_key IN ($placeholders) AND created_at >= DATE_SUB(NOW(), INTERVAL 30 DAY)
+            WHERE api_key = ? AND created_at >= DATE_SUB(NOW(), INTERVAL 30 DAY)
             GROUP BY DATE(created_at)
             ORDER BY date
         ");
-        $stmt->execute($userApiKeys);
+        $stmt->execute([$_SESSION['user_data']['api_key']]);
         $dailyData = $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
     

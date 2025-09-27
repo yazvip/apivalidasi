@@ -39,16 +39,15 @@ try {
     
     // Get logs for user's API keys
     $stmt = $pdo->prepare("
-        SELECT al.*, ak.name as api_key_name
+        SELECT al.*
         FROM api_logs al
-        JOIN api_keys ak ON al.api_key = ak.api_key
-        WHERE ak.user_id = ?
+        WHERE al.api_key = ?
         ORDER BY al.created_at DESC
         LIMIT :limit OFFSET :offset
     ");
     $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
     $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
-    $stmt->execute();
+    $stmt->execute([$_SESSION['user_data']['api_key']]);
     $logs = $stmt->fetchAll(PDO::FETCH_ASSOC);
     
 } catch (Exception $e) {
@@ -106,7 +105,7 @@ include 'includes/header.php';
                                     <?= date('Y-m-d H:i:s', strtotime($log['created_at'])) ?>
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                                    <?= htmlspecialchars($log['api_key_name']) ?>
+                                    <?= htmlspecialchars($_SESSION['user_data']['name']) ?>
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                                     <?= htmlspecialchars($log['ip_address']) ?>

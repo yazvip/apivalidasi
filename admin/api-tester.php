@@ -123,15 +123,20 @@ include 'includes/header.php';
                         <form method="POST" id="testForm">
                             <div class="mb-4">
                                 <label for="api_key" class="block text-sm font-medium text-gray-700 mb-2">API Key <span class="text-red-500">*</span></label>
-                                <select class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200" 
-                                        id="api_key" name="api_key" required>
-                                    <option value="">Select API Key</option>
-                                    <?php foreach ($availableApiKeys as $key): ?>
-                                    <option value="<?= htmlspecialchars($key['api_key']) ?>">
-                                        <?= htmlspecialchars($key['name']) ?> (<?= htmlspecialchars(substr($key['api_key'], 0, 20)) ?>...)
-                                    </option>
-                                    <?php endforeach; ?>
-                                </select>
+                                <div class="flex">
+                                    <select class="flex-1 px-4 py-3 border border-gray-300 rounded-l-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200" 
+                                            id="api_key" name="api_key" required>
+                                        <option value="">Select API Key</option>
+                                        <?php foreach ($availableApiKeys as $key): ?>
+                                        <option value="<?= htmlspecialchars($key['api_key']) ?>">
+                                            <?= htmlspecialchars($key['name']) ?> (<?= htmlspecialchars(substr($key['api_key'], 0, 20)) ?>...)
+                                        </option>
+                                        <?php endforeach; ?>
+                                    </select>
+                                    <button type="button" onclick="copySelectedApiKey()" class="px-4 py-3 bg-gray-100 hover:bg-gray-200 border border-l-0 border-gray-300 rounded-r-lg transition-colors duration-200">
+                                        <i class="fas fa-copy"></i>
+                                    </button>
+                                </div>
                             </div>
                             
                             <div class="mb-4">
@@ -374,7 +379,37 @@ function clearForm() {
 // Initialize form
 document.addEventListener('DOMContentLoaded', function() {
     toggleTypeFields();
+    
+    // Check for API key in URL parameter
+    const urlParams = new URLSearchParams(window.location.search);
+    const apiKeyParam = urlParams.get('api_key');
+    if (apiKeyParam) {
+        document.getElementById('api_key').value = apiKeyParam;
+    }
 });
+
+function copySelectedApiKey() {
+    const select = document.getElementById('api_key');
+    const apiKey = select.value;
+    
+    if (apiKey) {
+        navigator.clipboard.writeText(apiKey).then(() => {
+            // Show success message
+            const toast = document.createElement('div');
+            toast.className = 'fixed top-4 right-4 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg z-50 flex items-center';
+            toast.innerHTML = '<i class="fas fa-check mr-2"></i>API Key copied to clipboard!';
+            document.body.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.remove();
+            }, 3000);
+        }).catch(() => {
+            alert('Failed to copy to clipboard');
+        });
+    } else {
+        alert('Please select an API key first');
+    }
+}
 </script>
 
 <?php include 'includes/footer.php'; ?>
